@@ -23,4 +23,4 @@
 * ```npm run truffle-compile```
 * ```npm run truffle-migrate```
 * ```npm start```
-* Open http://localhost:3000 to the browser where metamask is installed.
+* Open http://localhost:3000 in a browser where metamask is installed.
