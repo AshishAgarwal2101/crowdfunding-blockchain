@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Web3 from "web3";
-import Marketplace from '../abis/Marketplace.json';
+import Crowdsource from '../abis/Crowdsource.json';
 
 const Entrypoint = (props) => {
     const [web3, setWeb3] = useState(null);
@@ -22,7 +22,6 @@ const Entrypoint = (props) => {
             await window.ethereum.request({ method: 'eth_accounts' });
             const newWeb3 = new Web3(window.ethereum);
             setWeb3(newWeb3);
-            console.log("newWeb3: ", newWeb3);
             await window.ethereum.enable();
         }
         else if (window.web3) {
@@ -39,14 +38,14 @@ const Entrypoint = (props) => {
         const accounts = await web3.eth.getAccounts();
         setAccount(accounts && accounts.length > 0 ? accounts[0] : null);
         const networkId = await web3.eth.net.getId();
-        const networkData = Marketplace.networks[networkId];
+        const networkData = Crowdsource.networks[networkId];
         if(networkData) {
-            const marketplace = new web3.eth.Contract(Marketplace.abi, networkData.address);
-            setContract(marketplace);
-            setRandomStr(await marketplace.methods.getRandomString().call());
-            console.log("Marketplace", marketplace);
+            const crowdsource = new web3.eth.Contract(Crowdsource.abi, networkData.address);
+            setContract(crowdsource);
+            setRandomStr(await crowdsource.methods.getRandomString().call());
+            //console.log("Crowdsource", crowdsource);
         } else {
-            window.alert('Marketplace contract not deployed to detected network.')
+            window.alert('Crowdsource contract not deployed to detected network.')
         }
     };
 

@@ -1,10 +1,10 @@
 pragma solidity ^0.5.0;
 
-contract Marketplace {
+contract Crowdsource {
     string public name;
 
     constructor() public {
-        name = "My marketplace";
+        name = "My crowdsouring platform";
     }
 
     function getRandomString() public pure returns(string memory) {
