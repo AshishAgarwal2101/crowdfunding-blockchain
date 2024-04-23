@@ -16,11 +16,11 @@
     * Add an account to metamask with this key.
 
 ## Setting up react and node
-* Install Node.js v20.11.0: https://nodejs.org/dist/v20.11.0/win-x64/node.exe
+* Install Node.js v20.11.0: https://nodejs.org
 * ```npm install```
 
 ## Running:
-* ```npm run truffle-compile```
-* ```npm run truffle-migrate```
+* ```npm run compile```
+* ```npm run migrate```
 * ```npm start```
 * Open http://localhost:3000 in a browser where metamask is installed.

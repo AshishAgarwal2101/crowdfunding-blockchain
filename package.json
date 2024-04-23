@@ -12,9 +12,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "truffle-compile": "truffle compile",
-    "truffle-migrate": "truffle migrate",
-    "truffle-console": "truffle console",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "console": "truffle console",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
