@@ -8,11 +8,13 @@ const Entrypoint = (props) => {
     const [contract, setContract] = useState(null);
     const [randomStr, setRandomStr] = useState("");
 
-    const connectMetamask = async (e) => {
-        e.stopPropagation();
-        await loadWeb3();
-        await loadBlockchain();
-    };
+    useEffect(() => {
+        loadWeb3();
+    }, []);
+
+    useEffect(() => {
+        loadBlockchain();
+    }, [web3]);
 
     const loadWeb3 = async () => {
         if (window.ethereum) {
@@ -20,7 +22,7 @@ const Entrypoint = (props) => {
             await window.ethereum.request({ method: 'eth_accounts' });
             const newWeb3 = new Web3(window.ethereum);
             setWeb3(newWeb3);
-            console.log("newWeb3: ", web3);
+            console.log("newWeb3: ", newWeb3);
             await window.ethereum.enable();
         }
         else if (window.web3) {
@@ -42,20 +44,14 @@ const Entrypoint = (props) => {
             const marketplace = new web3.eth.Contract(Marketplace.abi, networkData.address);
             setContract(marketplace);
             setRandomStr(await marketplace.methods.getRandomString().call());
-            console.log(marketplace);
+            console.log("Marketplace", marketplace);
         } else {
             window.alert('Marketplace contract not deployed to detected network.')
         }
     };
 
-    // useEffect(async () => {
-    //     await loadWeb3();
-    //     await loadBlockchain();
-    // }, []);
-
     return (
         <div>
-            <button onClick={connectMetamask}>Connect to Metamask</button>
             <div>HAHAHA</div>
             <div>Random String: {randomStr}</div>
         </div>
