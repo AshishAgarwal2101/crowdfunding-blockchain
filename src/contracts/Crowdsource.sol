@@ -9,9 +9,10 @@ contract Crowdsource {
     uint target = 3;
 
     enum CampaignState { CREATED, FUNDRAISING, COMPLETE, INCOMPLETE }
+
     struct Campaign {
         uint id;
-        address owner;
+        address payable owner;
         string description;
         uint targetFunds; //in gwei (1 ETH = 10^9 gwei)
         uint campaignEndTime;
@@ -22,7 +23,9 @@ contract Crowdsource {
     }
 
     mapping(uint => Campaign) campaignMap;
-    mapping(uint => mapping(address => bool)) voterDetails;
+    mapping(uint => mapping(address => bool)) voterDetails; //<campaignId, <voterAddress, hasVoted>>
+    mapping(uint => mapping(address => uint)) funders; //<campaignId, <funderAddress, fundedValue>>
+
 
 
     constructor() public {
@@ -67,6 +70,25 @@ contract Crowdsource {
         if(campaignMap[campaignId].currFunds >= campaignMap[campaignId].targetFunds) {
             campaignMap[campaignId].state == CampaignState.COMPLETE;
         }
+
+        funders[campaignId][msg.sender] = msg.value;
+    }
+
+    function withdrawIncompleteCampaignFundedAmount(uint campaignId) public payable  {
+        require(campaignMap[campaignId].state == CampaignState.INCOMPLETE, "Campaign not in incomplete state");
+        require(funders[campaignId][msg.sender] > 0, "No funding found for this user");
+
+        msg.sender.transfer(funders[campaignId][msg.sender]);
+        funders[campaignId][msg.sender] = 0;
+    }
+
+    function withdrawCampaignFunds(uint campaignId) public payable {
+        require(campaignMap[campaignId].state == CampaignState.COMPLETE, "Campaign has not met the target funding yet");
+        require(campaignMap[campaignId].owner == msg.sender, "Campaign does not belong to this user");
+        require(campaignMap[campaignId].currFunds > 0, "Campaign funds already withdrawn");
+
+        campaignMap[campaignId].owner.transfer(campaignMap[campaignId].currFunds);
+        campaignMap[campaignId].currFunds = 0;
     }
 
     function getRandomString() public pure returns(string memory) {
@@ -88,7 +110,6 @@ contract Crowdsource {
         if (diff>=target){
             campaignMap[campaignId].state = CampaignState.FUNDRAISING;
         }
-        
     }
 
     function getCampaign(uint256 campaignId) public view returns(Campaign memory campaign)  {
