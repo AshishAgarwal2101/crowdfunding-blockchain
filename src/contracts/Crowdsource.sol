@@ -1,10 +1,12 @@
 pragma solidity ^0.5.0;
+pragma experimental ABIEncoderV2;
 
 contract Crowdsource {
     string public constant symbol = "ETH";
     string public constant name = "Crowdsouring platform";
     address authorized;
     uint private lastId;
+    uint target = 3;
 
     enum CampaignState { CREATED, FUNDRAISING, COMPLETE, INCOMPLETE }
     struct Campaign {
@@ -18,6 +20,7 @@ contract Crowdsource {
     }
 
     mapping(uint => Campaign) campaignMap;
+    mapping(uint => mapping(address => bool)) voterDetails;
 
     constructor() public {
         authorized = msg.sender;
@@ -45,4 +48,28 @@ contract Crowdsource {
     function getRandomString() public pure returns(string memory) {
         return "Hello";
     }
+
+    function vote(uint256 campaignId, bool vote) public {
+        require(voterDetails[campaignId][msg.sender] == false,"Double Voting");
+        require(campaignMap[campaignId].state == CampaignState.CREATED,"Campaign is no longer in created stage");
+        if(vote){
+            campaignMap[campaignId].positiveVotes += 1;
+        }
+        else{
+             campaignMap[campaignId].negativeVotes += 1;
+        }
+        voterDetails[campaignId][msg.sender] = true;
+
+        uint diff = campaignMap[campaignId].positiveVotes - campaignMap[campaignId].negativeVotes;
+        if (diff>=target){
+            campaignMap[campaignId].state = CampaignState.FUNDRAISING;
+        }
+        
+    }
+
+    function getCampaign(uint256 campaignId) public view returns(Campaign memory campaign)  {
+        return campaignMap[campaignId];
+
+    }
+
 }
