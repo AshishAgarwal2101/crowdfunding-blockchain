@@ -12,10 +12,12 @@ contract Crowdsource {
         string description;
         uint targetFunds; //in gwei (1 ETH = 10^9 gwei)
         uint campaignEndTime;
+        uint positiveVotes;
+        uint negativeVotes;
+        CampaignState state;
     }
 
     mapping(uint => Campaign) campaignMap;
-    mapping(uint => CampaignState) campaignStates;
 
     constructor() public {
         authorized = msg.sender;
@@ -31,11 +33,13 @@ contract Crowdsource {
             ++lastId, 
             description, 
             targetFunds, 
-            block.timestamp + (duration * 24 * 60 * 60)
+            block.timestamp + (duration * 24 * 60 * 60),
+            0,
+            0,
+            CampaignState.CREATED
         );
 
         campaignMap[lastId] = campaign;
-        campaignStates[lastId] = CampaignState.CREATED;
     }
 
     function getRandomString() public pure returns(string memory) {
