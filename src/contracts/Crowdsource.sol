@@ -4,9 +4,9 @@ pragma experimental ABIEncoderV2;
 contract Crowdsource {
     string public constant symbol = "ETH";
     string public constant name = "Crowdsouring platform";
+    uint8 public constant TARGET_VOTES = 3;
     address authorized;
     uint private lastId;
-    uint target = 3;
 
     enum CampaignState { CREATED, FUNDRAISING, COMPLETE, INCOMPLETE }
 
@@ -26,11 +26,13 @@ contract Crowdsource {
     mapping(uint => mapping(address => bool)) voterDetails; //<campaignId, <voterAddress, hasVoted>>
     mapping(uint => mapping(address => uint)) funders; //<campaignId, <funderAddress, fundedValue>>
 
-
-
     constructor() public {
         authorized = msg.sender;
         lastId = 0;
+    }
+
+    function getRandomString() public pure returns(string memory) {
+        return "Hello";
     }
 
     //duration is in days
@@ -43,7 +45,8 @@ contract Crowdsource {
             msg.sender,
             description, 
             targetFunds, 
-            block.timestamp + (duration * 24 * 60 * 60),
+            block.timestamp + (3 * 60),
+            //block.timestamp + (duration * 24 * 60 * 60),
             0,
             0,
             0,
@@ -53,52 +56,55 @@ contract Crowdsource {
         campaignMap[lastId] = campaign;
     }
 
-    function getCampaigns() public view returns (Campaign[] memory campaigns) {
+    function getCampaigns() public returns (Campaign[] memory campaigns) {
         Campaign[] memory campaignArr = new Campaign[](lastId);
         for (uint256 i = 1; i <= lastId; i++) {
+            updateCampaignState(i);
             campaignArr[i - 1] = campaignMap[i];
         }
         return campaignArr;
     }
 
     function fundCampaign(uint campaignId) public payable {
+        updateCampaignState(campaignId);
+        require(msg.sender != campaignMap[campaignId].owner, "Campaign owners cannot fund their campaigns");
         require(msg.value > 0, "No ether was sent as part of transfer");
         require(campaignMap[campaignId].id == campaignId, "Invalid campaign ID");
-        require(campaignMap[campaignId].state == CampaignState.FUNDRAISING);
+        require(campaignMap[campaignId].state == CampaignState.FUNDRAISING, "Campaign not in fundraising state");
 
-        campaignMap[campaignId].currFunds += msg.value;
+        campaignMap[campaignId].currFunds += (msg.value / 1000000000);
         if(campaignMap[campaignId].currFunds >= campaignMap[campaignId].targetFunds) {
-            campaignMap[campaignId].state == CampaignState.COMPLETE;
+            campaignMap[campaignId].state = CampaignState.COMPLETE;
         }
 
         funders[campaignId][msg.sender] = msg.value;
     }
 
     function withdrawIncompleteCampaignFundedAmount(uint campaignId) public payable  {
+        updateCampaignState(campaignId);
         require(campaignMap[campaignId].state == CampaignState.INCOMPLETE, "Campaign not in incomplete state");
         require(funders[campaignId][msg.sender] > 0, "No funding found for this user");
 
-        msg.sender.transfer(funders[campaignId][msg.sender]);
+        msg.sender.transfer(funders[campaignId][msg.sender] * 1000000000);
         funders[campaignId][msg.sender] = 0;
     }
 
     function withdrawCampaignFunds(uint campaignId) public payable {
+        updateCampaignState(campaignId);
         require(campaignMap[campaignId].state == CampaignState.COMPLETE, "Campaign has not met the target funding yet");
         require(campaignMap[campaignId].owner == msg.sender, "Campaign does not belong to this user");
         require(campaignMap[campaignId].currFunds > 0, "Campaign funds already withdrawn");
 
-        campaignMap[campaignId].owner.transfer(campaignMap[campaignId].currFunds);
+        campaignMap[campaignId].owner.transfer(campaignMap[campaignId].currFunds * 1000000000);
         campaignMap[campaignId].currFunds = 0;
     }
 
-    function getRandomString() public pure returns(string memory) {
-        return "Hello";
-    }
-
-    function vote(uint256 campaignId, bool vote) public {
-        require(voterDetails[campaignId][msg.sender] == false,"Double Voting");
-        require(campaignMap[campaignId].state == CampaignState.CREATED,"Campaign is no longer in created stage");
-        if(vote){
+    function vote(uint256 campaignId, bool isPositiveVote) public {
+        updateCampaignState(campaignId);
+        require(msg.sender != campaignMap[campaignId].owner, "Campaign owners cannot vote for their campaign");
+        require(!voterDetails[campaignId][msg.sender], "Double Voting");
+        require(campaignMap[campaignId].state == CampaignState.CREATED, "Campaign is no longer in created stage");
+        if(isPositiveVote){
             campaignMap[campaignId].positiveVotes += 1;
         }
         else{
@@ -107,14 +113,20 @@ contract Crowdsource {
         voterDetails[campaignId][msg.sender] = true;
 
         uint diff = campaignMap[campaignId].positiveVotes - campaignMap[campaignId].negativeVotes;
-        if (diff>=target){
+        if (diff >= TARGET_VOTES){
             campaignMap[campaignId].state = CampaignState.FUNDRAISING;
         }
     }
 
-    function getCampaign(uint256 campaignId) public view returns(Campaign memory campaign)  {
+    function getCampaign(uint256 campaignId) public returns(Campaign memory campaign)  {
+        updateCampaignState(campaignId);
         return campaignMap[campaignId];
-
     }
 
+    function updateCampaignState(uint campaignId) private {
+        if(block.timestamp > campaignMap[campaignId].campaignEndTime 
+            && campaignMap[campaignId].currFunds < campaignMap[campaignId].targetFunds){
+            campaignMap[campaignId].state = CampaignState.INCOMPLETE;
+        }
+    }
 }
