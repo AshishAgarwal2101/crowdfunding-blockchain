@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 contract Crowdsource {
     string public constant symbol = "ETH";
-    string public constant name = "Crowdsouring platform";
+    string public constant APP_NAME = "Crowdsouring platform";
     uint8 public constant TARGET_VOTES = 3;
     address authorized;
     uint private lastId;
@@ -12,6 +12,7 @@ contract Crowdsource {
 
     struct Campaign {
         uint id;
+        string name;
         address payable owner;
         string description;
         uint targetFunds; //in gwei (1 ETH = 10^9 gwei)
@@ -35,18 +36,17 @@ contract Crowdsource {
         return "Hello";
     }
 
-    //duration is in days
-    function createCampaign(string memory description, uint targetFunds, uint duration) public {
+    //duration is in minutes
+    function createCampaign(string memory name, string memory description, uint targetFunds, uint duration) public {
         require(targetFunds >= 10000000, "Minimum target must be 0.01 ETH");
-        require(duration > 10, "Minimum duration must be 10 days");
 
         Campaign memory campaign = Campaign(
             ++lastId,
+            name,
             msg.sender,
             description, 
-            targetFunds, 
-            block.timestamp + (3 * 60),
-            //block.timestamp + (duration * 24 * 60 * 60),
+            targetFunds,
+            block.timestamp + (duration * 60),
             0,
             0,
             0,
@@ -56,10 +56,9 @@ contract Crowdsource {
         campaignMap[lastId] = campaign;
     }
 
-    function getCampaigns() public returns (Campaign[] memory campaigns) {
+    function getCampaigns() public view returns (Campaign[] memory campaigns) {
         Campaign[] memory campaignArr = new Campaign[](lastId);
         for (uint256 i = 1; i <= lastId; i++) {
-            updateCampaignState(i);
             campaignArr[i - 1] = campaignMap[i];
         }
         return campaignArr;
@@ -118,8 +117,7 @@ contract Crowdsource {
         }
     }
 
-    function getCampaign(uint256 campaignId) public returns(Campaign memory campaign)  {
-        updateCampaignState(campaignId);
+    function getCampaign(uint256 campaignId) public view returns(Campaign memory campaign)  {
         return campaignMap[campaignId];
     }
 

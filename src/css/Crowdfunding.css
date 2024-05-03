@@ -1,0 +1,206 @@
+* {
+box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+}
+
+.sidebar {
+    border-radius: 5px;
+    padding: 20px;
+    height: 100%;
+    max-width: 800px;
+    background-color: #f2f2f2;
+}
+
+input[type=text], select, textarea {
+    width: 500px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    display: block;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+}
+
+input[type=submit] {
+    background-color: #04AA6D;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+textarea {
+    height: 200px;
+}
+
+.header {
+    padding: 20px;
+    text-align: center;
+    background: #1abc9c;
+    color: white;
+}
+
+.header h1 {
+font-size: 40px;
+}
+
+.navbar {
+    overflow: hidden;
+    background-color: #333;
+    cursor: pointer;
+}
+
+.navbar a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.row {  
+    display: -ms-flexbox; /* IE10 */
+    display: flex;
+    -ms-flex-wrap: wrap; /* IE10 */
+    flex-wrap: wrap;
+}
+
+
+.side {
+    -ms-flex: 30%; /* IE10 */
+    flex: 30%;
+    background-color: #f1f1f1;
+    padding: 20px;
+}
+
+
+.main {   
+    -ms-flex: 70%; /* IE10 */
+    flex: 70%;
+    background-color: white;
+    padding: 20px;
+}
+
+.footer {
+    padding: 20px;
+    text-align: center;
+    background: #ddd;
+}
+
+.campaign-tile {
+    height: 340px;
+    width: 328px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    background: #FFF8DC;
+    display: inline-block;
+    margin: 20px;
+    vertical-align: bottom;
+}
+
+.campaign-tile hr {
+    border: 1px solid #ccc;
+}
+
+.campaign-name {
+    font-size: 25px;
+    color: #222;
+    font-weight: bold;
+}
+
+.campaign-name > span {
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.vote {
+    padding: 5px;
+}
+
+.vote > svg {
+    margin-left: 25px;
+}
+
+.positive-vote {
+    display: inline-block;
+    padding-left: 25px;
+}
+
+.negative-vote {
+    float: right;
+    padding-right: 25px;
+}
+
+.vote > p {
+    margin: 0;
+    font-size: 9px;
+}
+
+.campaign-name, .campaign-target, .campaign-funded {
+    padding: 10px;
+}
+
+.campaign-target {
+    padding-bottom: 0px;
+    color: #555;
+}
+
+.campaign-funded {
+    color: #555;
+}
+
+.campaign-target > span {
+    color: #008CBA;
+}
+
+.campaign-funded > span {
+    color: #1abc9c;
+}
+
+.campaign-description {
+    padding: 10px;
+    color: #888;
+}
+
+
+.add-icon {
+    height: fit-content;
+    width: fit-content;
+    margin: auto;
+    margin-top: 25%;
+}
+
+.add-icon > svg {
+    font-size: 100px;
+}
+
+
+
+/* Responsive layout - when the screen is less than 700px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 700px) {
+    .row {   
+        flex-direction: column;
+    }
+}
+
+/* Responsive layout - when the screen is less than 400px wide, make the navigation links stack on top of each other instead of next to each other */
+@media screen and (max-width: 400px) {
+    .navbar a {
+        float: none;
+        width: 100%;
+    }
+}
+
