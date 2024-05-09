@@ -10,7 +10,7 @@ const CampaignTile = (props) => {
 
     const tileStyle = props.skipVoteIcons ? {height: "270px"} : {};
 
-    const trimContent = (content, len = 200) => {
+    const trimContent = (content, len = 180) => {
         if (content.length <= len) {
             return content;
         } else {
