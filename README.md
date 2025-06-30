@@ -1,5 +1,8 @@
 # Crowdfunding Blockchain
 
+A decentralized crowdfunding platform built on Ethereum. Users can create, fund, and vote on crowdfunding campaigns using smart contracts. The platform features a React frontend that interacts with the blockchain via Web3 and MetaMask. Campaigns have funding goals and durations, and users can vote to approve campaigns before fundraising begins. Funds are managed securely through the smart contract, and withdrawals are based on campaign outcomes.
+
+
 ## Setting up Ganache
 * Install Ganache: https://archive.trufflesuite.com/ganache/
 * Set up a quick ethereum network
